@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura Stack | Premium Isometric Stacking</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient Background Lighting Effects -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="game-container">
+        <!-- Main Rendering Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Heads-Up Display (HUD) -->
+        <div id="hud" class="hud hidden">
+            <div class="hud-left">
+                <div class="score-container">
+                    <span class="label">SCORE</span>
+                    <span id="currentScore" class="value animate-pop">0</span>
+                </div>
+                <div id="streakBadge" class="streak-badge hidden">
+                    <span id="streakCount">0</span> PERFECT
+                </div>
+            </div>
+            <div class="hud-right">
+                <div class="coin-container">
+                    <svg class="coin-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                        <circle cx="12" cy="12" r="7" fill="none" stroke="#FFF" stroke-width="1.5" stroke-dasharray="3 2"/>
+                        <text x="12" y="16" font-family="Outfit" font-weight="800" font-size="12" fill="#B8860B" text-anchor="middle">C</text>
+                    </svg>
+                    <span id="hudCoins" class="value">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU SCREEN -->
+        <div id="menuScreen" class="overlay-screen active">
+            <div class="title-container">
+                <h1 class="game-title">AURA<br><span class="gradient-text">STACK</span></h1>
+                <p class="game-subtitle">Find your rhythm, build your tower</p>
+            </div>
+            
+            <div class="menu-actions">
+                <button id="btnPlay" class="btn btn-primary animate-pulse">
+                    <span>TAP TO PLAY</span>
+                </button>
+                <div class="secondary-actions">
+                    <button id="btnShop" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                        <span>THEMES</span>
+                    </button>
+                    <button id="btnToggleSound" class="btn btn-secondary">
+                        <svg id="soundIconOn" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        </svg>
+                        <svg id="soundIconOff" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                            <line x1="23" y1="9" x2="17" y2="15"/>
+                            <line x1="17" y1="9" x2="23" y2="15"/>
+                        </svg>
+                        <span id="soundText">SOUND ON</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="best-score-badge">
+                <span class="label">BEST SCORE</span>
+                <span id="menuBestScore" class="value">0</span>
+            </div>
+        </div>
+
+        <!-- REVIVE SCREEN -->
+        <div id="reviveScreen" class="overlay-screen hidden">
+            <div class="glass-card revive-card">
+                <h2>TOWER FALLEN!</h2>
+                <p>Revive to continue your streak</p>
+                
+                <div class="countdown-container">
+                    <svg class="countdown-svg" viewBox="0 0 100 100">
+                        <circle class="countdown-bg" cx="50" cy="50" r="45"></circle>
+                        <circle id="countdownBar" class="countdown-bar" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div id="countdownText" class="countdown-text">5</div>
+                </div>
+
+                <button id="btnWatchAd" class="btn btn-ad">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span>REVIVE (WATCH AD)</span>
+                </button>
+                <button id="btnSkipRevive" class="btn btn-link">No Thanks</button>
+            </div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="overlay-screen hidden">
+            <div class="glass-card end-card">
+                <h2 class="game-over-title">GAME OVER</h2>
+                
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="label">FINAL SCORE</span>
+                        <span id="endScore" class="value text-highlight">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">BEST</span>
+                        <span id="endBestScore" class="value">0</span>
+                    </div>
+                </div>
+
+                <div class="reward-box">
+                    <span class="label">COINS EARNED</span>
+                    <div class="reward-coins">
+                        <svg viewBox="0 0 24 24" width="22" height="22">
+                            <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                            <text x="12" y="16" font-family="Outfit" font-weight="800" font-size="12" fill="#B8860B" text-anchor="middle">C</text>
+                        </svg>
+                        <span id="endEarnedCoins" class="value">0</span>
+                    </div>
+                    
+                    <!-- Rewarded Ad: Double Coins -->
+                    <button id="btnDoubleCoins" class="btn btn-ad btn-small">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                        <span>DOUBLE COINS (WATCH AD)</span>
+                    </button>
+                </div>
+
+                <div class="game-over-actions">
+                    <button id="btnRestart" class="btn btn-primary">
+                        <span>PLAY AGAIN</span>
+                    </button>
+                    <button id="btnBackToMenu" class="btn btn-secondary">
+                        <span>MAIN MENU</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOP SCREEN -->
+        <div id="shopScreen" class="overlay-screen hidden">
+            <div class="glass-card shop-card">
+                <div class="shop-header">
+                    <h2>THEMES</h2>
+                    <button id="btnCloseShop" class="btn-close">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="shop-wallet">
+                    <span class="label">YOUR COINS</span>
+                    <div class="coin-display">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                            <text x="12" y="16" font-family="Outfit" font-weight="800" font-size="12" fill="#B8860B" text-anchor="middle">C</text>
+                        </svg>
+                        <span id="shopCoins" class="value">0</span>
+                    </div>
+                </div>
+
+                <div id="themesContainer" class="themes-grid">
+                    <!-- Themes will be injected dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- AD POPUP SIMULATOR -->
+        <div id="adSimulator" class="ad-simulator hidden">
+            <div class="ad-content">
+                <div class="ad-header">
+                    <span class="ad-badge">SPONSORED AD</span>
+                    <span id="adTimer" class="ad-timer">5s</span>
+                </div>
+                <div class="ad-body">
+                    <div class="ad-logo">AURA</div>
+                    <h3>Experience the Ultimate Flow</h3>
+                    <p>Upgrade to Premium for an ad-free experience, unlimited skips, and exclusive neon colorways.</p>
+                    <div class="ad-mock-video">
+                        <div class="spinner"></div>
+                        <span>Streaming promotional gameplay...</span>
+                    </div>
+                </div>
+                <div class="ad-footer">
+                    <button id="btnSkipAd" class="btn btn-secondary disabled" disabled>SKIP AD IN 5S</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
